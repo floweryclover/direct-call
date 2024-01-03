@@ -10,12 +10,7 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener
 import android.os.Build
 import android.util.Log
 
-class MyBroadcastReceiver(wifiP2pManager: WifiP2pManager, channel: WifiP2pManager.Channel, activity: Activity, peerListListener: PeerListListener) : BroadcastReceiver() {
-    private val wifiP2pManager = wifiP2pManager
-    private val channel = channel
-    private val activity = activity
-    private val peerListListener = peerListListener
-
+class MyBroadcastReceiver(private val wifiP2pManager: WifiP2pManager, private val channel: WifiP2pManager.Channel, private val activity: Activity, private val peerListListener: PeerListListener) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent:Intent) {
         Log.d("INFO", "OnReceive()")
         when (intent.action) {
