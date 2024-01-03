@@ -11,6 +11,7 @@ import android.os.Bundle
 import kr.co.starryflower.directcall.databinding.ActivityMainBinding
 import android.os.Build
 import android.util.Log
+import android.widget.Button
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -24,6 +25,13 @@ class MainActivity : AppCompatActivity() {
         val refreshedPeers = peerList.deviceList
         peers.clear()
         peers.addAll(refreshedPeers)
+
+        binding.peers.removeAllViews()
+        for (peer in peers) {
+            val button = Button(this)
+            button.text = peer.deviceName
+            binding.peers.addView(button)
+        }
 
         discoverPeers()
     }
