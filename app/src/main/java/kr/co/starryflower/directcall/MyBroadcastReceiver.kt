@@ -1,6 +1,5 @@
 package kr.co.starryflower.directcall
 
-import android.Manifest
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -10,7 +9,6 @@ import android.net.wifi.p2p.WifiP2pManager
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener
 import android.os.Build
 import android.util.Log
-import androidx.core.app.ActivityCompat
 
 class MyBroadcastReceiver(wifiP2pManager: WifiP2pManager, channel: WifiP2pManager.Channel, activity: Activity, peerListListener: PeerListListener) : BroadcastReceiver() {
     private val wifiP2pManager = wifiP2pManager
@@ -31,9 +29,8 @@ class MyBroadcastReceiver(wifiP2pManager: WifiP2pManager, channel: WifiP2pManage
                 } else {
                     android.Manifest.permission.NEARBY_WIFI_DEVICES
                 }
-                if (activity.checkSelfPermission(permissionForWifiDirectif) == PackageManager.PERMISSION_DENIED) {
-                    activity.requestPermissions(arrayOf(permissionForWifiDirectif), 1)
-                }
+                // 이 코드가 실행되고 있다는 것은 이미 P2P 권한이 부여되어 discoverPeers()가 호출되었다는 뜻, 따라서 assert함
+                assert(activity.checkSelfPermission(permissionForWifiDirectif) == PackageManager.PERMISSION_GRANTED)
 
                 wifiP2pManager.requestPeers(channel, peerListListener)
                 Log.d("INFO", "onReceive() -> WIFI_P2P_PEERS_CHANGED_ACTION")
