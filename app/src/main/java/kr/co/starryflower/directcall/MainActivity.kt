@@ -29,13 +29,11 @@ class MainActivity : AppCompatActivity() {
         channel = manager.initialize(this, mainLooper, null)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        receiver = MyBroadcastReceiver(manager, channel, this, peerListListener)
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION)
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
-        registerReceiver(receiver, intentFilter)
 
         val permissionForWifiDirectif = if (Build.VERSION.SDK_INT < 33) {
             android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -45,5 +43,16 @@ class MainActivity : AppCompatActivity() {
         if (checkSelfPermission(permissionForWifiDirectif) == PackageManager.PERMISSION_DENIED) {
             requestPermissions(arrayOf(permissionForWifiDirectif), 1)
         }
+    }
+
+    public override fun onResume() {
+        super.onResume()
+        receiver = MyBroadcastReceiver(manager, channel, this, peerListListener)
+        registerReceiver(receiver, intentFilter)
+    }
+
+    public override fun onPause() {
+        super.onPause()
+        unregisterReceiver(receiver)
     }
 }
