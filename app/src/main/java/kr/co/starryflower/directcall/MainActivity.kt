@@ -4,14 +4,11 @@ import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.wifi.p2p.WifiP2pDevice
-import android.net.wifi.p2p.WifiP2pDeviceList
 import android.net.wifi.p2p.WifiP2pManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import kr.co.starryflower.directcall.databinding.ActivityMainBinding
-import android.Manifest
 import android.os.Build
-import android.util.Log
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -24,12 +21,6 @@ class MainActivity : AppCompatActivity() {
         val refreshedPeers = peerList.deviceList
         peers.clear()
         peers.addAll(refreshedPeers)
-
-        if (peers.isNotEmpty()) {
-            binding.myText.text = peers[0].deviceName
-        } else {
-            binding.myText.text = "상대 없음"
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,19 +44,6 @@ class MainActivity : AppCompatActivity() {
         }
         if (checkSelfPermission(permissionForWifiDirectif) == PackageManager.PERMISSION_DENIED) {
             requestPermissions(arrayOf(permissionForWifiDirectif), 1)
-        }
-
-
-        binding.searchButton.setOnClickListener {
-            manager.discoverPeers(channel, object: WifiP2pManager.ActionListener {
-                override fun onSuccess() {
-                    Log.d("INFO", "discoverPeers().onSuccess()")
-                }
-
-                override fun onFailure(p0: Int) {
-                    Log.d("ERROR", "discoverPeers().onFailure() $p0")
-                }
-            })
         }
     }
 }
