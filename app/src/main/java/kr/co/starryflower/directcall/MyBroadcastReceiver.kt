@@ -19,13 +19,8 @@ class MyBroadcastReceiver(private val wifiP2pManager: WifiP2pManager, private va
 
             }
             WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
-                val permissionForWifiDirectif = if (Build.VERSION.SDK_INT < 33) {
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                } else {
-                    android.Manifest.permission.NEARBY_WIFI_DEVICES
-                }
                 // 이 코드가 실행되고 있다는 것은 이미 P2P 권한이 부여되어 discoverPeers()가 호출되었다는 뜻, 따라서 assert함
-                assert(activity.checkSelfPermission(permissionForWifiDirectif) == PackageManager.PERMISSION_GRANTED)
+                assert(activity.checkSelfPermission(Permissions.getPermissionForWifiDirect()) == PackageManager.PERMISSION_GRANTED)
 
                 wifiP2pManager.requestPeers(channel, peerListListener)
                 Log.d("INFO", "onReceive() -> WIFI_P2P_PEERS_CHANGED_ACTION")

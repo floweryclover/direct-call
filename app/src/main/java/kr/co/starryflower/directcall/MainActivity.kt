@@ -6,12 +6,16 @@ import android.content.pm.PackageManager
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import android.net.wifi.p2p.WifiP2pManager.ActionListener
+import android.net.wifi.p2p.WifiP2pConfig
+import android.net.wifi.WpsInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import kr.co.starryflower.directcall.databinding.ActivityMainBinding
 import android.os.Build
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
+import kr.co.starryflower.directcall.databinding.ActivityMainBinding
+import kr.co.starryflower.directcall.Permissions
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -30,6 +34,25 @@ class MainActivity : AppCompatActivity() {
         for (peer in peers) {
             val button = Button(this)
             button.text = peer.deviceName
+            button.setOnClickListener {
+                val config = WifiP2pConfig().apply {
+                    deviceAddress = peer.deviceAddress
+                    wps.setup = WpsInfo.PBC
+                }
+                manager.connect(channel, config, object : WifiP2pManager.ActionListener {
+                    override fun onSuccess() {
+
+                    }
+
+                    override fun onFailure(p0: Int) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "연결에 실패했습니다. 재시도하세요.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                })
+            }
             binding.peers.addView(button)
         }
 
@@ -48,13 +71,8 @@ class MainActivity : AppCompatActivity() {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
 
-        val permissionForWifiDirectif = if (Build.VERSION.SDK_INT < 33) {
-            android.Manifest.permission.ACCESS_FINE_LOCATION
-        } else {
-            android.Manifest.permission.NEARBY_WIFI_DEVICES
-        }
-        if (checkSelfPermission(permissionForWifiDirectif) == PackageManager.PERMISSION_DENIED) {
-            requestPermissions(arrayOf(permissionForWifiDirectif), 1)
+        if (checkSelfPermission(Permissions.getPermissionForWifiDirect()) == PackageManager.PERMISSION_DENIED) {
+            requestPermissions(arrayOf(Permissions.getPermissionForWifiDirect()), 1)
         }
     }
 
@@ -72,14 +90,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun discoverPeers() {
-        val permissionForWifiDirect = if (Build.VERSION.SDK_INT < 33) {
-            android.Manifest.permission.ACCESS_FINE_LOCATION
-        } else {
-            android.Manifest.permission.NEARBY_WIFI_DEVICES
-        }
-
-        assert(checkSelfPermission(permissionForWifiDirect) == PackageManager.PERMISSION_GRANTED)
-
+        assert(checkSelfPermission(Permissions.getPermissionForWifiDirect()) == PackageManager.PERMISSION_GRANTED)
         manager.discoverPeers(channel,  object : ActionListener {
             override fun onSuccess() {
                 Log.d("SUCCESS", "")
